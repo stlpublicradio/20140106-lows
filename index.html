@@ -7,7 +7,16 @@ body {
   font-family: 'Titillium Web', sans-serif;
   font-size: 18px;
   shape-rendering: crispEdges;
-  width:100%;
+  width:550px;
+}
+
+h1 {
+	margin:0px;
+}
+
+p {
+	font-size: 16px;
+	margin: 0px;
 }
 
 .bar {
@@ -39,7 +48,9 @@ body {
 	display: none;
 }
 
-#bar-10 rect {
+#lowhi-12,
+#lowlow-12,
+#lowavg-12 {
 	fill: #55b7d9;
 }
 
@@ -54,19 +65,24 @@ body {
 
 </style>
 <body>
-	<div id="lowhi"></div>
-	<div id="lowlow"></div>
-	<div id="lowavg"></div>
+	<div id="lowhi"><h1>Lowest high temperatures</h1>
+		<p>These are daily coldest high temperatures for the past 100 years. January 6 was tied for eighth lowest high, with a high of 2&deg;F (which, by the way, came before 1 a.m.). The lowest high temperature St. Louis has recorded is -5&deg;F, on Christmas Eve, 1983.</p></div><hr>
+	<div id="lowlow"><h1>Lowest low temperatures</h1>
+			<p>These are daily coldest low temperatures for the past 100 years, plus January 6. Monday's low of 8&deg;F didn't come close to cracking the top ten. January 18, 1930 holds the record for the past century, with a low of -19&deg;F.</p></div><hr>
+	<div id="lowavg"><h1>Lowest average temperatures</h1>
+		<p>Our average temperature January 6 was -3&deg;F. That ties for 14th among lowest average temperatures in the past 100 years. Three times in the past century (all in the 1980s), the average was -8.5&deg;F. </p></div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
-var 	margin = {top: 20, right: 30, bottom: 280, left: 40},
+var 	margin = {top: 20, right: 30, bottom: 125, left: 40},
 	width = 550 - margin.left - margin.right,
-	height = 400 - margin.top - margin.bottom;
+	height = 250 - margin.top - margin.bottom;
 	
 var	parseDate = d3.time.format("%d-%b-%Y").parse;
 
 var outputDate = d3.time.format("%b. %d, %Y");
+
+var tempFormat = d3.format(" d")
 	    
 var x = d3.scale.ordinal()
 	.rangeRoundBands([0, width], .1);
@@ -80,7 +96,8 @@ var xAxis = d3.svg.axis()
 	
 var yAxis = d3.svg.axis()
 	.scale(y)
-	.orient("left");
+	.orient("left")
+	.tickFormat(function(d) { return tempFormat(d) + "\260F";});
 
 var svg = d3.select("#lowhi").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -101,6 +118,7 @@ var bar = svg.selectAll(".bar")
 	.attr("class","bargroup")
 	bar.append("rect")
 	.attr("class", function(d) {return d.temp < 0 ? "bar negative" : "bar positive"; })
+	.attr("id", function(d, i) { return "lowhi-" + i; })
 	.attr("x", function(d) { return x(d.date); })
 	.attr("y", function(d) { return y(Math.max(d.temp, 0)); })
 	.attr("width", x.rangeBand())
@@ -109,7 +127,7 @@ var bar = svg.selectAll(".bar")
 	bar.append("text")
 	.attr("class", "label")
 	.attr("x", -110)
-	.attr("y", function(d) { return x(d.date) + 13; })
+	.attr("y", function(d) { return x(d.date) + 16; })
 	.attr("dy", ".35em")
 	.attr("transform", "rotate(-90)")
 	.text( function(d) { return outputDate(d.date) });
@@ -139,7 +157,8 @@ var bar2 = svg2.selectAll(".bar")
 	.attr("class","bargroup")
 	bar2.append("rect")
 	.attr("class", function(d) {return d.temp < 0 ? "bar negative" : "bar positive"; })
-	.attr("x", function(d) { return x(d.date); })
+	.attr("id", function(d, i) { return "lowlow-" + i; })
+		.attr("x", function(d) { return x(d.date); })
 	.attr("y", function(d) { return y(Math.max(d.temp, 0)); })
 	.attr("width", x.rangeBand())
 	.attr("height", function(d) { return Math.abs(y(d.temp) - y(0)); });
@@ -147,7 +166,7 @@ var bar2 = svg2.selectAll(".bar")
 	bar2.append("text")
 	.attr("class", "label")
 	.attr("x", -110)
-	.attr("y", function(d) { return x(d.date) + 0; })
+	.attr("y", function(d) { return x(d.date) + 16; })
 	.attr("dy", ".35em")
 	.attr("transform", "rotate(-90)")
 	.text( function(d) { return outputDate(d.date) });
@@ -178,6 +197,7 @@ var bar = svg3.selectAll(".bar")
 	.attr("class","bargroup")
 	bar.append("rect")
 	.attr("class", function(d) {return d.temp < 0 ? "bar negative" : "bar positive"; })
+	.attr("id", function(d, i) { return "lowavg-" + i; })
 	.attr("x", function(d) { return x(d.date); })
 	.attr("y", function(d) { return y(Math.max(d.temp, 0)); })
 	.attr("width", x.rangeBand())
@@ -186,7 +206,7 @@ var bar = svg3.selectAll(".bar")
 	bar.append("text")
 	.attr("class", "label")
 	.attr("x", -110)
-	.attr("y", function(d) { return x(d.date) + 3; })
+	.attr("y", function(d) { return x(d.date) + 16; })
 	.attr("dy", ".35em")
 	.attr("transform", "rotate(-90)")
 	.text( function(d) { return outputDate(d.date) });
